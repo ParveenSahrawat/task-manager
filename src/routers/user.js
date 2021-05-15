@@ -4,6 +4,7 @@ const sharp = require('sharp');
 const router = new express.Router();
 const User = require('../models/user');
 
+const { sendWelcomeEmail, sendCancellationEmail } = require('../emails/account');
 const auth = require('../middleware/auth');
 const upload = multer({
     limits: {
@@ -33,6 +34,7 @@ router.post('/users/signup', async (req, res) => {
     try {
         const user = new User(req.body);
         const result = await user.save();
+        sendWelcomeEmail(user.email, user.name);
         const token = await result.generateAuthToken({ _id: result._id.toString() }, 'thisismynodecourse');
 
         res.status(201).send({ user: result, token });
@@ -73,7 +75,7 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
     const buffer = await sharp(req.file.buffer)
         .resize({ width: 250, height: 250 })
         .png().toBuffer();
-        
+
     req.user.avatar = buffer;
     await req.user.save();
     res.send();
@@ -137,6 +139,7 @@ router.patch('/users/me', auth, async (req, res) => {
 router.delete('/users/me', auth, async (req, res) => {
     try {
         await req.user.remove();
+        sendCancellationEmail(req.user.email, req.user.name);
         res.send(req.user);
     } catch (error) {
         res.status(500).send(error);
