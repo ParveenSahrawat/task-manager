@@ -120,7 +120,7 @@ router.get('/users/:_id/avatar', async (req, res) => {
 router.patch('/users/me', auth, async (req, res) => {
     const allowedUpdates = Object.keys(User.schema.paths).filter(val => {
         return !['_id', '__v'].includes(val);
-    }); GET
+    });
     const updates = Object.keys(req.body);
     const isUpdateValid = updates.every(update => allowedUpdates.includes(update));
 

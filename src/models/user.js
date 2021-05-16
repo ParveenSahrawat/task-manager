@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        minlength: 7,
+        minlength: 6,
         trim: true,
         validate(value) {
             if (value.toLowerCase().includes('password'))
@@ -78,7 +78,6 @@ userSchema.statics.findByCredentials = async (email, password) => {
     if (!user)
         throw new Error('Unable to login');
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch)
         throw new Error('Unable to login');
     return user;
