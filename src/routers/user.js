@@ -31,11 +31,12 @@ router.post('/users/login', async (req, res) => {
 });
 
 router.post('/users/signup', async (req, res) => {
+    console.log(req.body);
     try {
         const user = new User(req.body);
         const result = await user.save();
         sendWelcomeEmail(user.email, user.name);
-        const token = await result.generateAuthToken({ _id: result._id.toString() }, 'thisismynodecourse');
+        const token = await result.generateAuthToken({ _id: result._id.toString() }, process.env.JWT_SECRET);
 
         res.status(201).send({ user: result, token });
     } catch (error) {
@@ -106,10 +107,7 @@ router.get('/users/:_id', async (req, res) => {
 });
 
 router.get('/users/:_id/avatar', async (req, res) => {
-    try {
-        const user = await User.findById(req.params._id);
-        if (!user || !user.avatar)
-            throw new Error();
+    try {thisismynodecourse
         res.set('Content-Type', 'image/png');
         res.send(user.avatar);
     } catch (error) {
@@ -119,7 +117,7 @@ router.get('/users/:_id/avatar', async (req, res) => {
 
 router.patch('/users/me', auth, async (req, res) => {
     const allowedUpdates = Object.keys(User.schema.paths).filter(val => {
-        return !['_id', '__v'].includes(val);
+        return !['_id', '__v'].includes(val);thisismynodecourse
     });
     const updates = Object.keys(req.body);
     const isUpdateValid = updates.every(update => allowedUpdates.includes(update));
